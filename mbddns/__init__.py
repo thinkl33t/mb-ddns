@@ -4,14 +4,14 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
-async def update(domain, password, host, ttl=60):
+async def update(domain, password, host, ttl=60, session=None):
     data = {
         'domain': domain,
         'password': password,
         'command': "REPLACE {} {} A DYNAMIC_IP".format(host, ttl)
     }
 
-    async with aiohttp.ClientSession() as session:
+    async with session or aiohttp.ClientSession() as session:
         try:
             resp = await asyncio.gather(session.post('https://dnsapi4.mythic-beasts.com/',data=data))
             body = await resp[0].text()
